@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 import google.generativeai as genai
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
@@ -52,4 +53,5 @@ def ingest_pdf(pdf_path: str):
     return vectorstore
 
 if __name__ == "__main__":
-    ingest_pdf("data/Document.pdf")
+    pdf_path = sys.argv[1] if len(sys.argv) > 1 else "data/Document.pdf"
+    ingest_pdf(pdf_path)
