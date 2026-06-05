@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import Chroma
-
+from langchain_chroma import Chroma
 load_dotenv()
 
 def ingest_pdf(pdf_path: str):
