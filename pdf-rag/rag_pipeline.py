@@ -7,7 +7,7 @@ from langchain_classic.chains import RetrievalQA
 
 load_dotenv()
 
-def load_rag_pipeline():
+def load_rag_pipeline(collection_name: str):
     # Step 1: Load embeddings model
     embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
