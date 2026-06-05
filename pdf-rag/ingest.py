@@ -11,8 +11,11 @@ load_dotenv()
 
 def ingest_pdf(pdf_path: str):
     print(f"Loading PDF from: {pdf_path}")
-    
-    # Step 1: Load PDF
+
+    # Use filename as collection name
+    collection_name = os.path.splitext(os.path.basename(pdf_path))[0]
+    collection_name = collection_name.replace(" ", "_").lower()
+
     loader = PyPDFLoader(pdf_path)
     pages = loader.load()
     print(f"Loaded {len(pages)} pages")
@@ -40,7 +43,8 @@ def ingest_pdf(pdf_path: str):
             vectorstore = Chroma.from_documents(
                 documents=batch,
                 embedding=embeddings,
-                persist_directory="./chroma_db"
+                persist_directory="./chroma_db",
+                collection_name=collection_name
             )
         else:
             vectorstore.add_documents(batch)
@@ -49,8 +53,8 @@ def ingest_pdf(pdf_path: str):
             print("Waiting 65 seconds to avoid rate limit...")
             time.sleep(65)
 
-    print("Done! PDF ingested and stored in chroma_db/")
-    return vectorstore
+    print(f"Done! PDF ingested under collection: {collection_name}")
+    return collection_name
 
 if __name__ == "__main__":
     pdf_path = sys.argv[1] if len(sys.argv) > 1 else "data/Document.pdf"

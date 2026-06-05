@@ -14,13 +14,12 @@ def load_rag_pipeline():
     # Step 2: Load existing ChromaDB
     vectorstore = Chroma(
         persist_directory="./chroma_db",
-        embedding_function=embeddings
+        embedding_function=embeddings,
+        collection_name=collection_name
     )
 
-    # Step 3: Create retriever (fetch top 4 most relevant chunks)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
 
-    # Step 4: Load Gemini LLM
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
         temperature=0.3
@@ -28,7 +27,7 @@ def load_rag_pipeline():
 
     # Step 5: Create prompt template
     prompt_template = """
-    You are a helpful assistant. Use the following context retrieved from a PDF document 
+    You are a helpful assistant. Use the following context retrieved from a PDF document
     to answer the user's question accurately.
     If the answer is not found in the context, say "I could not find relevant information in the document."
 
@@ -58,8 +57,8 @@ def load_rag_pipeline():
     return qa_chain
 
 
-def ask_question(question: str):
-    qa_chain = load_rag_pipeline()
+def ask_question(question: str, collection_name: str):
+    qa_chain = load_rag_pipeline(collection_name)
     result = qa_chain.invoke({"query": question})
 
     answer = result["result"]
@@ -80,10 +79,3 @@ def ask_question(question: str):
         "answer": answer,
         "sources": sorted(sources) if sources else []
     }
-
-
-if __name__ == "__main__":
-    question = "What is the main topic of this document?"
-    response = ask_question(question)
-    print(f"\nAnswer: {response['answer']}")
-    print(f"Sources (pages): {response['sources']}")
