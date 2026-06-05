@@ -62,16 +62,23 @@ def ask_question(question: str):
     qa_chain = load_rag_pipeline()
     result = qa_chain.invoke({"query": question})
 
-    # Extract source references (page numbers)
-    sources = []
-    for doc in result["source_documents"]:
-        page = doc.metadata.get("page", "unknown")
-        if page not in sources:
-            sources.append(page)
+    answer = result["result"]
+
+    # Only return sources if relevant answer was found
+    if "could not find" in answer.lower():
+        sources = []
+    else:
+        sources = []
+        for doc in result["source_documents"]:
+            page = doc.metadata.get("page", "unknown")
+            if isinstance(page, int):
+                page = page + 1
+            if page not in sources:
+                sources.append(page)
 
     return {
-        "answer": result["result"],
-        "sources": sorted(sources)
+        "answer": answer,
+        "sources": sorted(sources) if sources else []
     }
 
 
